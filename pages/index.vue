@@ -12,6 +12,7 @@
         </ul>
       </div>
       <div class="editor">
+        <img v-if="fileStatus.base64"  :src="fileStatus.base64" />
         <textarea v-if="file" @keydown.tab.prevent="insertTab($event)" v-model="file" v-text="file"></textarea>
       
         <div class="links">
@@ -35,7 +36,10 @@
       return {
         dir: null,
         file: null,
-        path: ""
+        path: "",
+        searchString: [''],
+        filteredList: '',
+        fileStatus: {open: false, file: null, fileType: null}
       };
     },
     created: function() {
@@ -44,8 +48,27 @@
         .then(response => (this.dir = response.data));
     },
     methods: {
+      clearSearch() {
+        this.searchString = ['']
+      },
       addToPath(str) {
-        this.path = this.path + "/" + str;
+        if (this.fileStatus.open) {
+          this.path = this.path.replace(this.fileStatus.file, '')
+          this.path = this.path.replace(/\/\//, '')
+        }
+    // if (this.dir.includes(str)) {
+    //   var breadcrumb = this.path.split('/')
+    //   breadcrumb.pop()
+    //   breadcrumb.join('/')
+    //   console.log('breadcrumb ' + breadcrumb)
+    //   breadcrumb += '/'
+    //   breadcrumb += str
+
+    //   this.path = breadcrumb
+    // } else {
+	        this.path = this.path + "/" + str;
+
+	// }
         this.getList();
       },
       insertTab(event) {
@@ -58,6 +81,7 @@
         event.target.selectionEnd = event.target.selectionStart = originalSelectionStart + 1
       },
       getList() {
+      
         axios
           .post("http://localhost:3333/", {
             path: this.path
@@ -70,11 +94,20 @@
               return (this.dir = response.data.dir);
             }
             if (response.data.file) {
-              this.dir = null;
+              //this.dir = null;
               this.file = null;
+              var filename = this.path
+              this.fileStatus = {
+                open: true,
+                file: this.path.split('/').pop()
+              }
+              if (this.fileStatus.file.match(/.png|.jpg/)){
+                this.fileStatus.base64 = 'data:image/'+this.fileStatus.file.split('.')[1]+';base64,' + response.data.file
+              }
+  
               return (this.file = response.data.file);
             } else {
-              this.dir = null
+              //this.dir = null
               this.file = null
             }
           });
@@ -136,10 +169,9 @@ button {
 }
   ul {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    flex-wrap: wrap;
     list-style: none;
     padding: 20px;
     min-height: 40vh;
@@ -172,6 +204,9 @@ button {
   }
   input.search {
     border-bottom: 1px solid gainsboro;
+    font-size: 16px;
+    color: white;
+    border-right: 1px solid gainsboro;
   }
 
   button {
@@ -192,5 +227,9 @@ textarea {
 width: 59vw;
 height: 78vh;
 color: white;
+font-size: 20px;
+}
+.hidden {
+  display: none;
 }
 </style>

@@ -14,6 +14,9 @@ class ListController {
                 let result = (async() => {
                     const stat = await fs.lstat(path);
                     if (stat.isFile()){
+			if (path.match(/.png|.jpg/)) {
+			    return {file: await fs.readFile(path, 'base64')}
+			}
                         return {file: await fs.readFile(path, 'utf-8')}
                         return fs.readFile(path)
                     }
