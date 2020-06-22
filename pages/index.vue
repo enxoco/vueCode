@@ -1,5 +1,6 @@
 <template>
 <div>
+
   <h1 class="title">vueCode</h1>
   <div class="container">
       <div class="sidebar">
@@ -13,7 +14,9 @@
       </div>
       <div class="editor">
         <img v-if="fileStatus.base64"  :src="fileStatus.base64" />
-        <textarea v-if="file" @keydown.tab.prevent="insertTab($event)" v-model="file" v-text="file"></textarea>
+  <pre v-if="file" @keydown.tab.prevent="insertTab($event)" v-highlightjs="file"><code class="javascript" contenteditable="true" @blur="onEdit"></code></pre>
+
+        <!-- <textarea v-if="file" @keydown.tab.prevent="insertTab($event)" v-model="file" v-text="file"></textarea> -->
       
         <div class="links">
           <a @click="deleteFile" class="button--green">Delete file</a>
@@ -51,24 +54,18 @@
       clearSearch() {
         this.searchString = ['']
       },
+               onEdit(evt){
+             var src = evt.target.innerText
+             this.file = src
+         },
       addToPath(str) {
         if (this.fileStatus.open) {
           this.path = this.path.replace(this.fileStatus.file, '')
           this.path = this.path.replace(/\/\//, '')
         }
-    // if (this.dir.includes(str)) {
-    //   var breadcrumb = this.path.split('/')
-    //   breadcrumb.pop()
-    //   breadcrumb.join('/')
-    //   console.log('breadcrumb ' + breadcrumb)
-    //   breadcrumb += '/'
-    //   breadcrumb += str
 
-    //   this.path = breadcrumb
-    // } else {
 	        this.path = this.path + "/" + str;
 
-	// }
         this.getList();
       },
       insertTab(event) {
@@ -206,7 +203,8 @@ button {
     border-bottom: 1px solid gainsboro;
     font-size: 16px;
     color: white;
-    border-right: 1px solid gainsboro;
+    border-right: 11px solid yellow;
+    z-index: 99;
   }
 
   button {
@@ -232,4 +230,9 @@ font-size: 20px;
 .hidden {
   display: none;
 }
+img {
+    max-width: 100%;
+    max-height: 100%;
+}
+.hljs{display:block;overflow-x:auto;padding:0.5em;background:#F0F0F0;text-align:left;height:78.5vh;width:59.5vw;}.hljs,.hljs-subst{color:#444}.hljs-comment{color:#888888}.hljs-keyword,.hljs-attribute,.hljs-selector-tag,.hljs-meta-keyword,.hljs-doctag,.hljs-name{font-weight:bold}.hljs-type,.hljs-string,.hljs-number,.hljs-selector-id,.hljs-selector-class,.hljs-quote,.hljs-template-tag,.hljs-deletion{color:#880000}.hljs-title,.hljs-section{color:#880000;font-weight:bold}.hljs-regexp,.hljs-symbol,.hljs-variable,.hljs-template-variable,.hljs-link,.hljs-selector-attr,.hljs-selector-pseudo{color:#BC6060}.hljs-literal{color:#78A960}.hljs-built_in,.hljs-bullet,.hljs-code,.hljs-addition{color:#397300}.hljs-meta{color:#1f7199}.hljs-meta-string{color:#4d99bf}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:bold}
 </style>
